@@ -1,4 +1,4 @@
-# Object Member Presence Check library for spray-json [![Build Status](https://travis-ci.org/bigwheel/spray-json-member-presence.svg?branch=master)](https://travis-ci.org/bigwheel/spray-json-member-presence)
+# Object Member Presence Check for spray-json [![Build Status](https://travis-ci.org/bigwheel/spray-json-member-presence.svg?branch=master)](https://travis-ci.org/bigwheel/spray-json-member-presence)
 
 ## What is this ?
 
