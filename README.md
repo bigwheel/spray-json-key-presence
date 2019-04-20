@@ -5,7 +5,7 @@
 Default JsonReader of spray-json maps both JSON's null value and
 no presense of [object member](https://tools.ietf.org/html/rfc8259#section-4) to `None`.
 Therefore, we cannot determine null or no presence of key if `None` comes
-(See [Sample Code](#Sample Code)!).
+(See [Sample Code](#sample-code)!).
 
 This library introduces an type to check member presence and
 `None` becomes to be used only for JSON's null.
