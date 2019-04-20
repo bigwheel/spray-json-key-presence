@@ -1,6 +1,6 @@
-package spray.json
+package spray.json.member
 
-import tekito._
+import spray.json._
 
 trait KeyPresenceFormat {
   _: StandardFormats with ProductFormats =>

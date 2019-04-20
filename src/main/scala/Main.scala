@@ -1,5 +1,5 @@
 import spray.json._
-import tekito._
+import spray.json.member._
 
 object Main {
 

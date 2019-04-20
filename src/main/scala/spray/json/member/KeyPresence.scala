@@ -1,4 +1,4 @@
-package tekito
+package spray.json.member
 
 // this file is copied from Option.scala
 object KeyPresence {
@@ -93,3 +93,4 @@ case object KeyNotExist extends KeyPresence[Nothing] {
   def isEmpty = true
   def get = throw new NoSuchElementException("KeyNotExist.get")
 }
+

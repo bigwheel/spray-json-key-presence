@@ -1,6 +1,6 @@
 import org.scalatest.{FunSpec, Matchers}
 import spray.json._
-import tekito._
+import spray.json.member._
 
 class KeyPresenceSpec extends FunSpec with Matchers {
 
