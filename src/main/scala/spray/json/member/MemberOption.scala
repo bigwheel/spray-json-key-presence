@@ -1,14 +1,14 @@
 package spray.json.member
 
 // this file is copied from Option.scala
-object KeyPresence {
+object MemberOption {
   import scala.language.implicitConversions
-  implicit def keyPresence2Iterable[A](xo: KeyPresence[A]): Iterable[A] = xo.toList
-  def apply[A](x: A): KeyPresence[A] = if (x == null) KeyNotExist else KeyExist(x)
-  def empty[A]: KeyPresence[A] = KeyNotExist
+  implicit def memberOption2Iterable[A](xo: MemberOption[A]): Iterable[A] = xo.toList
+  def apply[A](x: A): MemberOption[A] = if (x == null) MemberNone else MemberSome(x)
+  def empty[A]: MemberOption[A] = MemberNone
 }
 
-sealed abstract class KeyPresence[+A] extends Product with Serializable {
+sealed abstract class MemberOption[+A] extends Product with Serializable {
   self =>
 
   def isEmpty: Boolean
@@ -22,31 +22,31 @@ sealed abstract class KeyPresence[+A] extends Product with Serializable {
 
   @inline final def orNull[A1 >: A](implicit ev: Null <:< A1): A1 = this getOrElse ev(null)
 
-  @inline final def map[B](f: A => B): KeyPresence[B] =
-    if (isEmpty) KeyNotExist else KeyExist(f(this.get))
+  @inline final def map[B](f: A => B): MemberOption[B] =
+    if (isEmpty) MemberNone else MemberSome(f(this.get))
 
   @inline final def fold[B](ifEmpty: => B)(f: A => B): B =
     if (isEmpty) ifEmpty else f(this.get)
 
-  @inline final def flatMap[B](f: A => KeyPresence[B]): KeyPresence[B] =
-    if (isEmpty) KeyNotExist else f(this.get)
+  @inline final def flatMap[B](f: A => MemberOption[B]): MemberOption[B] =
+    if (isEmpty) MemberNone else f(this.get)
 
-  def flatten[B](implicit ev: A <:< KeyPresence[B]): KeyPresence[B] =
-    if (isEmpty) KeyNotExist else ev(this.get)
+  def flatten[B](implicit ev: A <:< MemberOption[B]): MemberOption[B] =
+    if (isEmpty) MemberNone else ev(this.get)
 
-  @inline final def filter(p: A => Boolean): KeyPresence[A] =
-    if (isEmpty || p(this.get)) this else KeyNotExist
+  @inline final def filter(p: A => Boolean): MemberOption[A] =
+    if (isEmpty || p(this.get)) this else MemberNone
 
-  @inline final def filterNot(p: A => Boolean): KeyPresence[A] =
-    if (isEmpty || !p(this.get)) this else KeyNotExist
+  @inline final def filterNot(p: A => Boolean): MemberOption[A] =
+    if (isEmpty || !p(this.get)) this else MemberNone
 
   final def nonEmpty = isDefined
 
   @inline final def withFilter(p: A => Boolean): WithFilter = new WithFilter(p)
 
   class WithFilter(p: A => Boolean) {
-    def map[B](f: A => B): KeyPresence[B] = self filter p map f
-    def flatMap[B](f: A => KeyPresence[B]): KeyPresence[B] = self filter p flatMap f
+    def map[B](f: A => B): MemberOption[B] = self filter p map f
+    def flatMap[B](f: A => MemberOption[B]): MemberOption[B] = self filter p flatMap f
     def foreach[U](f: A => U): Unit = self filter p foreach f
     def withFilter(q: A => Boolean): WithFilter = new WithFilter(x => p(x) && q(x))
   }
@@ -63,10 +63,10 @@ sealed abstract class KeyPresence[+A] extends Product with Serializable {
     if (!isEmpty) f(this.get)
   }
 
-  @inline final def collect[B](pf: PartialFunction[A, B]): KeyPresence[B] =
-    if (!isEmpty) pf.lift(this.get).fold[KeyPresence[B]](KeyNotExist)(KeyExist(_)) else KeyNotExist
+  @inline final def collect[B](pf: PartialFunction[A, B]): MemberOption[B] =
+    if (!isEmpty) pf.lift(this.get).fold[MemberOption[B]](MemberNone)(MemberSome(_)) else MemberNone
 
-  @inline final def orElse[B >: A](alternative: => KeyPresence[B]): KeyPresence[B] =
+  @inline final def orElse[B >: A](alternative: => MemberOption[B]): MemberOption[B] =
     if (isEmpty) alternative else this
 
   def iterator: Iterator[A] =
@@ -82,14 +82,14 @@ sealed abstract class KeyPresence[+A] extends Product with Serializable {
     if (isEmpty) Right(right) else Left(this.get)
 }
 
-final case class KeyExist[+A](@deprecatedName('x, "2.12.0") value: A) extends KeyPresence[A] {
+final case class MemberSome[+A](@deprecatedName('x, "2.12.0") value: A) extends MemberOption[A] {
   def isEmpty = false
   def get = value
 
   @deprecated("Use .value instead.", "2.12.0") def x: A = value
 }
 
-case object KeyNotExist extends KeyPresence[Nothing] {
+case object MemberNone extends MemberOption[Nothing] {
   def isEmpty = true
   def get = throw new NoSuchElementException("KeyNotExist.get")
 }

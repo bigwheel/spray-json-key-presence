@@ -28,7 +28,7 @@ libraryDependencies += "com.github.bigwheel" %% "spray-json-member-presence" % "
 
 ```scala
 val nullValue = """{ "a": null }""".parseJson
-val noKeyPresence = """{}""".parseJson
+val noMember = """{}""".parseJson
 
 case class CaseClassA(a: Option[Int])
 object CaseClassA extends DefaultJsonProtocol {
@@ -36,16 +36,16 @@ object CaseClassA extends DefaultJsonProtocol {
 }
 
 println(nullValue.convertTo[CaseClassA]) // CaseClassA(None)
-println(noKeyPresence.convertTo[CaseClassA]) // CaseClassA(None)
+println(noMember.convertTo[CaseClassA]) // CaseClassA(None)
 println("Cannot distinguish 😞")
 
-case class CaseClassB(a: KeyPresence[Option[Int]])
-object CaseClassB extends KeyPresenceJsonProtocol {
+case class CaseClassB(a: MemberOption[Option[Int]])
+object CaseClassB extends MemberPresenceJsonProtocol {
   implicit val caseClassBFormat = jsonFormat1(CaseClassB.apply)
 }
 
 println(nullValue.convertTo[CaseClassB]) // CaseClassB(KeyExist(None))
-println(noKeyPresence.convertTo[CaseClassB]) // CaseClassB(KeyNotExist)
+println(noMember.convertTo[CaseClassB]) // CaseClassB(KeyNotExist)
 println("Now we can, yeah ☺️")
 ```
 
