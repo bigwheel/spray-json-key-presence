@@ -1,0 +1,17 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <option name="LINE_SEPARATOR" value="&#10;" />
+    <option name="RIGHT_MARGIN" value="100" />
+    <option name="FORMATTER_TAGS_ENABLED" value="true" />
+    <option name="FORMATTER_ON_TAG" value="format: on" />
+    <option name="FORMATTER_OFF_TAG" value="format: off" />
+    <ScalaCodeStyleSettings>
+      <option name="classCountToUseImportOnDemand" value="3" />
+      <option name="importLayout">
+        <array>
+          <option value="all other imports" />
+        </array>
+      </option>
+    </ScalaCodeStyleSettings>
+  </code_scheme>
+</component>
