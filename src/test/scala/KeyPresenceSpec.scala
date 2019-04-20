@@ -4,118 +4,114 @@ import tekito._
 
 class KeyPresenceSpec extends FunSpec with Matchers {
 
-  private[this] val nullValue = """{"a": null}""".parseJson
-  private[this] val notNullValue = """{"a": 1}""".parseJson
-  private[this] val noKeyPresence = """{}""".parseJson
+  private[this] val _1_notNullValue = """{ "a": 1 }""".parseJson
+  private[this] val _2_nullValue = """{ "a": null }""".parseJson
+  private[this] val _3_noKeyPresence = """{}""".parseJson
 
-  describe("play spray-json") {
+  describe("in plain spray-json") {
 
-    describe("with not option case class") {
-      case class PlainSpray(a: Int)
-      object PlainSpray extends DefaultJsonProtocol {
-        implicit val playSprayFormat = jsonFormat1(PlainSpray.apply)
+    describe("with case class `CaseClass(a: Int)`") {
+      case class CaseClass(a: Int)
+      object CaseClass extends DefaultJsonProtocol {
+        implicit val playSprayFormat = jsonFormat1(CaseClass.apply)
       }
 
-      it("null value throws Exception") {
-        assertThrows[DeserializationException] {
-          nullValue.convertTo[PlainSpray]
-        }
+      it("`{ \"a\": 1 }`    is parsed As `CaseClass(1)`") {
+        _1_notNullValue.convertTo[CaseClass] should be(CaseClass(1))
       }
 
-      it("not null value is parsed As 1") {
-        notNullValue.convertTo[PlainSpray] should be(PlainSpray(1))
+      it("`{ \"a\": null }` throws Exception") {
+        assertThrows[DeserializationException] { _2_nullValue.convertTo[CaseClass] }
       }
 
-      it("no key presence throws Exception") {
-        assertThrows[DeserializationException] {
-          noKeyPresence.convertTo[PlainSpray]
-        }
+      it("`{}`            throws Exception") {
+        assertThrows[DeserializationException] { _3_noKeyPresence.convertTo[CaseClass] }
       }
     }
 
-    describe("with option case class") {
-      case class PlainSpray(a: Option[Int])
-      object PlainSpray extends DefaultJsonProtocol {
-        implicit val playSprayFormat = jsonFormat1(PlainSpray.apply)
+    describe("with case class `CaseClass(a: Option[Int])`") {
+      case class CaseClass(a: Option[Int])
+      object CaseClass extends DefaultJsonProtocol {
+        implicit val playSprayFormat = jsonFormat1(CaseClass.apply)
       }
 
-      it("null value is parsed as None") {
-        nullValue.convertTo[PlainSpray] should be(PlainSpray(None))
+      it("`{ \"a\": 1 }`    is parsed As `CaseClass(Some(1))`") {
+        _1_notNullValue.convertTo[CaseClass] should be(CaseClass(Some(1)))
       }
 
-      it("not null value is parsed as Some(1)") {
-        notNullValue.convertTo[PlainSpray] should be(PlainSpray(Some(1)))
+      it("`{ \"a\": null }` is parsed As `CaseClass(None)`") {
+        _2_nullValue.convertTo[CaseClass] should be(CaseClass(None))
       }
 
-      it("no key presence is parsed as None") {
-        noKeyPresence.convertTo[PlainSpray] should be(PlainSpray(None))
+      it("`{}`            is parsed As `CaseClass(None)`") {
+        _3_noKeyPresence.convertTo[CaseClass] should be(CaseClass(None))
       }
     }
 
-    describe("with double option case class (as followings, this doesn't work as I expected)") {
-      case class PlainSpray(a: Option[Option[Int]])
-      object PlainSpray extends DefaultJsonProtocol {
-        implicit val playSprayFormat = jsonFormat1(PlainSpray.apply)
+    describe(
+      "with case class `CaseClass(a: Option[Option[Int]])`" +
+        " (as below, doesn't work as I expected)"
+    ) {
+      case class CaseClass(a: Option[Option[Int]])
+      object CaseClass extends DefaultJsonProtocol {
+        implicit val playSprayFormat = jsonFormat1(CaseClass.apply)
       }
 
-      it("null value is parsed as None") {
-        nullValue.convertTo[PlainSpray] should be(PlainSpray(None))
+      it("`{ \"a\": 1 }`    is parsed As `CaseClass(Some(Some(1)))`") {
+        _1_notNullValue.convertTo[CaseClass] should be(CaseClass(Some(Some(1))))
       }
 
-      it("not null value is parsed as Some(1)") {
-        notNullValue.convertTo[PlainSpray] should be(PlainSpray(Some(Some(1))))
+      it(
+        "`{ \"a\": null }` is parsed As `CaseClass(None)`" +
+          " but I expected `CaseClass(Some(None))`"
+      ) {
+        _2_nullValue.convertTo[CaseClass] should be(CaseClass(None))
       }
 
-      it("no key presence is parsed as None") {
-        noKeyPresence.convertTo[PlainSpray] should be(PlainSpray(None))
+      it("`{}`            is parsed As `CaseClass(None)`") {
+        _3_noKeyPresence.convertTo[CaseClass] should be(CaseClass(None))
       }
     }
 
   }
 
-  describe("play spray-json") {
+  describe("in spray-json with this library") {
 
-    describe("with KeyPresence case class") {
-      case class KeyPresenceSpray(a: KeyPresence[Int])
-      object KeyPresenceSpray extends KeyPresenceJsonProtocol {
-        implicit val keyPresenceSprayFormat = jsonFormat1(KeyPresenceSpray.apply)
+    describe("with case class `CaseClass(a: KeyPresence[Int])`") {
+      case class CaseClass(a: KeyPresence[Int])
+      object CaseClass extends KeyPresenceJsonProtocol {
+        implicit val keyPresenceSprayFormat = jsonFormat1(CaseClass.apply)
       }
 
-      it("null value throws Exception") {
-        assertThrows[DeserializationException] {
-          nullValue.convertTo[KeyPresenceSpray]
-        }
+      it("`{ \"a\": 1 }`    is parsed As `CaseClass(KeyExist(1))`") {
+        _1_notNullValue.convertTo[CaseClass] should be(CaseClass(KeyExist(1)))
       }
 
-      it("not null value is parsed as KeyExist(1)") {
-        notNullValue.convertTo[KeyPresenceSpray] should be(
-          KeyPresenceSpray(KeyExist(1))
-        )
+      it("`{ \"a\": null }` throws Exception") {
+        assertThrows[DeserializationException] { _2_nullValue.convertTo[CaseClass] }
       }
 
-      it("no key presence is parsed as KeyNotExist") {
-        noKeyPresence.convertTo[KeyPresenceSpray] should be(KeyPresenceSpray(KeyNotExist))
+      it("`{}`            is parsed As `CaseClass(KeyNotExist)`") {
+        _3_noKeyPresence.convertTo[CaseClass] should be(CaseClass(KeyNotExist))
       }
     }
 
-    describe("with KeyPresence option case class") {
-      case class KeyPresenceSpray(a: KeyPresence[Option[Int]])
-      object KeyPresenceSpray extends KeyPresenceJsonProtocol {
-        implicit val keyPresenceSprayFormat = jsonFormat1(KeyPresenceSpray.apply)
+    describe("with case class `CaseClass(a: KeyPresence[Option[Int]])`") {
+      case class CaseClass(a: KeyPresence[Option[Int]])
+      object CaseClass extends KeyPresenceJsonProtocol {
+        implicit val keyPresenceSprayFormat = jsonFormat1(CaseClass.apply)
       }
 
-      it("null value is parsed as KeyExist(None)") {
-        nullValue.convertTo[KeyPresenceSpray] should be(KeyPresenceSpray(KeyExist(None)))
+      it("`{ \"a\": 1 }`    is parsed As `CaseClass(KeyExist(Some(1)))`") {
+        _1_notNullValue.convertTo[CaseClass] should be(CaseClass(KeyExist(Some(1))))
       }
 
-      it("not null value is parsed as KeyExist(Some(1))") {
-        notNullValue.convertTo[KeyPresenceSpray] should be(
-          KeyPresenceSpray(KeyExist(Some(1)))
-        )
+      it("`{ \"a\": null }` is parsed As `CaseClass(KeyExist(None))`") {
+        _2_nullValue.convertTo[CaseClass] should be(CaseClass(KeyExist(None)))
       }
 
-      it("no key presence is parsed as KeyNotExist") {
-        noKeyPresence.convertTo[KeyPresenceSpray] should be(KeyPresenceSpray(KeyNotExist))
+      it("`{}`            is parsed As `CaseClass(KeyNotExist)`") {
+        _3_noKeyPresence.convertTo[CaseClass] should be(CaseClass(KeyNotExist))
       }
     }
 
