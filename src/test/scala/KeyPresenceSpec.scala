@@ -1,5 +1,6 @@
 import org.scalatest.{FunSpec, Matchers}
 import spray.json._
+import tekito._
 
 class KeyPresenceSpec extends FunSpec with Matchers {
 
@@ -68,50 +69,9 @@ class KeyPresenceSpec extends FunSpec with Matchers {
     }
 
     describe("with KeyPresence case class") {
-      type JF[T] = JsonFormat[T] // simple alias for reduced verbosity
-
-      implicit def keyPresenceFormat[T: JF]: JF[KeyPresence[T]] = new KeyPresenceFormat[T]
-
-      class KeyPresenceFormat[T: JF] extends JF[KeyPresence[T]] {
-        def write(option: KeyPresence[T]) = option match {
-          case KeyExist(x) => x.toJson
-          case KeyNotExist => JsNull
-        }
-        def read(value: JsValue) = KeyExist(value.convertTo[T])
-      }
-
       case class KeyPresenceSpray(a: KeyPresence[Int])
-      object TekitoScope extends DefaultJsonProtocol {
-        override protected def fromField[T](value: JsValue, fieldName: String)(
-            implicit reader: JsonReader[T]
-        ) = value match {
-          case x: JsObject
-              if reader.isInstanceOf[KeyPresenceFormat[_]] &
-                !x.fields.contains(fieldName) =>
-            KeyNotExist.asInstanceOf[T]
-          case x: JsObject =>
-            try reader.read(x.fields(fieldName))
-            catch {
-              case e: NoSuchElementException =>
-                deserializationError(
-                  "Object is missing required member '" + fieldName + "'",
-                  e,
-                  fieldName :: Nil
-                )
-              case DeserializationException(msg, cause, fieldNames) =>
-                deserializationError(msg, cause, fieldName :: fieldNames)
-            }
-          case _ =>
-            deserializationError(
-              "Object expected in field '" + fieldName + "'",
-              fieldNames = fieldName :: Nil
-            )
-        }
-
-        implicit val keyPresenceSprayFormat = jsonFormat1(KeyPresenceSpray)
-      }
-
-      import TekitoScope.keyPresenceSprayFormat
+      import KeyPresenceJsonProtocol._
+      implicit val keyPresenceSprayFormat = jsonFormat1(KeyPresenceSpray)
 
       it("null value throws Exception") {
         assertThrows[DeserializationException] {
@@ -122,6 +82,26 @@ class KeyPresenceSpec extends FunSpec with Matchers {
       it("not null value is parsed as KeyExist(1)") {
         notNullValue.parseJson.convertTo[KeyPresenceSpray] should be(
           KeyPresenceSpray(KeyExist(1))
+        )
+      }
+
+      it("no key presence is parsed as KeyNotExist") {
+        noKeyPresence.parseJson.convertTo[KeyPresenceSpray] should be(KeyPresenceSpray(KeyNotExist))
+      }
+    }
+
+    describe("with KeyPresence option case class") {
+      case class KeyPresenceSpray(a: KeyPresence[Option[Int]])
+      import KeyPresenceJsonProtocol._
+      implicit val keyPresenceSprayFormat = jsonFormat1(KeyPresenceSpray)
+
+      it("null value is parsed as KeyExist(None)") {
+        nullValue.parseJson.convertTo[KeyPresenceSpray] should be(KeyPresenceSpray(KeyExist(None)))
+      }
+
+      it("not null value is parsed as KeyExist(Some(1))") {
+        notNullValue.parseJson.convertTo[KeyPresenceSpray] should be(
+          KeyPresenceSpray(KeyExist(Some(1)))
         )
       }
 

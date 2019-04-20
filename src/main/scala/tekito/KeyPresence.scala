@@ -1,3 +1,5 @@
+package tekito
+
 // this file is copied from Option.scala
 object KeyPresence {
   import scala.language.implicitConversions
