@@ -42,4 +42,6 @@ trait KeyPresenceFormat {
   }
 }
 
-object KeyPresenceJsonProtocol extends DefaultJsonProtocol with KeyPresenceFormat
+trait KeyPresenceJsonProtocol extends DefaultJsonProtocol with KeyPresenceFormat
+
+object KeyPresenceJsonProtocol extends KeyPresenceJsonProtocol
