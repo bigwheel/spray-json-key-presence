@@ -21,8 +21,8 @@ object Main {
       implicit val caseClassBFormat = jsonFormat1(CaseClassB.apply)
     }
 
-    println(nullValue.convertTo[CaseClassB]) // CaseClassB(KeyExist(None))
-    println(noMember.convertTo[CaseClassB]) // CaseClassB(KeyNotExist)
+    println(nullValue.convertTo[CaseClassB]) // CaseClassB(MemberSome(None))
+    println(noMember.convertTo[CaseClassB]) // CaseClassB(MemberNone)
     println("Now we can, yeah ☺️")
   }
 

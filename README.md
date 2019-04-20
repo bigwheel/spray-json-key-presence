@@ -4,7 +4,7 @@
 
 Default JsonReader of spray-json maps both JSON's null value and
 no presense of [object member](https://tools.ietf.org/html/rfc8259#section-4) to `None`.
-Therefore, we cannot determine null or no presence of key if `None` comes
+Therefore, we cannot determine null or no presence of member if `None` comes
 (See [Sample Code](#sample-code)!).
 
 This library introduces an type to check member presence and
@@ -44,8 +44,8 @@ object CaseClassB extends MemberPresenceJsonProtocol {
   implicit val caseClassBFormat = jsonFormat1(CaseClassB.apply)
 }
 
-println(nullValue.convertTo[CaseClassB]) // CaseClassB(KeyExist(None))
-println(noMember.convertTo[CaseClassB]) // CaseClassB(KeyNotExist)
+println(nullValue.convertTo[CaseClassB]) // CaseClassB(MemberSome(None))
+println(noMember.convertTo[CaseClassB]) // CaseClassB(MemberNone)
 println("Now we can, yeah ☺️")
 ```
 
