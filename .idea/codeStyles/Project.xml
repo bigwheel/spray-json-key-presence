@@ -12,6 +12,7 @@
           <option value="all other imports" />
         </array>
       </option>
+      <option name="FORMATTER" value="1" />
     </ScalaCodeStyleSettings>
   </code_scheme>
 </component>
