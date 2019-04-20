@@ -1,4 +1,4 @@
-name := "spray-json-key-presence"
+name := "spray-json-member-presence"
 organization := "com.github.bigwheel"
 version := "0.1"
 scalaVersion := "2.12.8"
@@ -18,12 +18,12 @@ publishTo := {
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 publishArtifact in Test := false
-licenses := Seq("MIT License" -> url("https://github.com/bigwheel/spray-json-key-presence/blob/master/LICENSE"))
-homepage := Some(url("https://github.com/bigwheel/spray-json-key-presence"))
+licenses := Seq("MIT License" -> url("https://github.com/bigwheel/spray-json-member-presence/blob/master/LICENSE"))
+homepage := Some(url("https://github.com/bigwheel/spray-json-member-presence"))
 pomExtra := (
   <scm>
-    <url>git@github.com:bigwheel/spray-json-key-presence.git</url>
-    <connection>scm:git:git@github.com:bigwheel/spray-json-key-presence.git</connection>
+    <url>git@github.com:bigwheel/spray-json-member-presence.git</url>
+    <connection>scm:git:git@github.com:bigwheel/spray-json-member-presence.git</connection>
   </scm>
     <developers>
       <developer>
